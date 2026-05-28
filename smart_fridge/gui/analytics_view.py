@@ -145,10 +145,9 @@ class AnalyticsView(ctk.CTkFrame):
         top     = top_used(history, n=5)
         dist    = category_distribution(self.fridge)
 
-        # 밝은/어두운 모드에 따라 차트 배경 설정
-        is_dark = ctk.get_appearance_mode() == "Dark"
-        bg      = "#2B2B2B" if is_dark else "#FFFFFF"
-        fg_text = "#EEEEEE" if is_dark else "#111111"
+        # 차트 색상 (라이트 모드 기준)
+        bg      = "#FFFFFF"
+        fg_text = "#111111"
 
         self._fig = Figure(figsize=(10, 3.8), dpi=90, facecolor=bg)
         self._fig.subplots_adjust(left=0.08, right=0.95, top=0.88, bottom=0.18,

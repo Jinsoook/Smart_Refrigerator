@@ -87,16 +87,6 @@ class SmartFridgeApp(ctk.CTk):
             btn.grid(row=row_idx + 3, column=0, padx=10, pady=3, sticky="ew")
             self._nav_buttons[view_name] = btn
 
-        # 하단 구분선 + 다크모드 토글
-        ctk.CTkFrame(sb, height=1, fg_color=("gray70", "gray40")).grid(
-            row=8, column=0, sticky="ew", padx=15, pady=(10, 5)
-        )
-        ctk.CTkLabel(sb, text="다크 모드", font=ctk.CTkFont(size=12)).grid(
-            row=9, column=0, padx=20, pady=(5, 3)
-        )
-        self._dark_sw = ctk.CTkSwitch(sb, text="", command=self._toggle_dark)
-        self._dark_sw.grid(row=10, column=0, padx=20, pady=(0, 20))
-
     def _build_content(self) -> None:
         """우측 콘텐츠 영역 컨테이너를 구성합니다."""
         self.content = ctk.CTkFrame(self, corner_radius=0, fg_color="transparent")
@@ -144,9 +134,3 @@ class SmartFridgeApp(ctk.CTk):
             btn.configure(
                 fg_color=("gray75", "gray25") if k == name else "transparent"
             )
-
-    # ── 다크모드 ─────────────────────────────────────────────
-
-    def _toggle_dark(self) -> None:
-        """다크/라이트 모드를 전환합니다."""
-        ctk.set_appearance_mode("dark" if self._dark_sw.get() else "light")
