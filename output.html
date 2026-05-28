@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🧊 스마트 냉장고 — 프로젝트 분석 대시보드</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<style>
+:root {
+  --bg:#0d1117; --bg2:#161b22; --bg3:#21262d;
+  --border:#30363d; --text:#e6edf3; --muted:#8b949e;
+  --blue:#58a6ff; --green:#3fb950; --orange:#d29922;
+  --red:#f85149; --purple:#d2a8ff; --yellow:#e3b341;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
+  background:var(--bg);color:var(--text);font-size:14px;line-height:1.6}
+code{font-family:'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace}
+
+/* Header */
+.hdr{background:linear-gradient(135deg,#161b22 0%,#0d1117 100%);
+  border-bottom:1px solid var(--border);padding:28px 40px 20px}
+.hdr-top{display:flex;align-items:center;gap:14px;margin-bottom:6px;flex-wrap:wrap}
+.hdr h1{font-size:26px;font-weight:700}
+.badge{background:var(--bg3);border:1px solid var(--border);border-radius:20px;
+  padding:3px 11px;font-size:11px;color:var(--muted)}
+.hdr p{color:var(--muted);font-size:13px}
+
+/* Stats */
+.stats{display:flex;gap:28px;padding:14px 40px;background:var(--bg2);
+  border-bottom:1px solid var(--border);flex-wrap:wrap}
+.stat{display:flex;align-items:center;gap:8px}
+.stat-n{font-size:22px;font-weight:700;color:var(--blue)}
+.stat-l{font-size:11px;color:var(--muted);line-height:1.2}
+
+/* Tabs */
+.tabs{display:flex;border-bottom:1px solid var(--border);padding:0 40px;
+  background:var(--bg);position:sticky;top:0;z-index:100;gap:2px}
+.tab-btn{padding:13px 20px;background:none;border:none;
+  border-bottom:2px solid transparent;color:var(--muted);font-size:14px;
+  cursor:pointer;white-space:nowrap;transition:color .2s,border-color .2s;
+  font-family:inherit}
+.tab-btn:hover{color:var(--text)}
+.tab-btn.active{color:var(--blue);border-bottom-color:var(--blue)}
+
+/* Tab content */
+.tab{display:none;padding:32px 40px;max-width:1260px;margin:0 auto}
+.tab.active{display:block}
+
+/* Sections */
+.sec{font-size:18px;font-weight:700;margin:32px 0 14px;padding-bottom:8px;
+  border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.sec:first-child{margin-top:0}
+
+/* Cards */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;
+  margin-bottom:18px;overflow:hidden}
+.card-pad{padding:18px 20px}
+
+/* Layer diagram */
+.layers{border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:18px}
+.layer{display:flex;align-items:flex-start;gap:14px;padding:14px 18px;
+  border-bottom:1px solid var(--border)}
+.layer:last-child{border-bottom:none}
+.lbl{min-width:130px;font-size:10px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.06em;padding:4px 10px;border-radius:4px;white-space:nowrap;margin-top:2px}
+.lbl-e{background:#2d2a0a;color:#e3b341}
+.lbl-g{background:#1f3040;color:#58a6ff}
+.lbl-b{background:#1a3a1a;color:#3fb950}
+.lbl-d{background:#2d1a2d;color:#d2a8ff}
+.chips{display:flex;flex-wrap:wrap;gap:7px;align-items:center}
+.chip{background:var(--bg3);border:1px solid var(--border);border-radius:4px;
+  padding:3px 9px;font-size:12px;font-family:monospace}
+.layer-note{font-size:11px;color:var(--muted);margin-top:6px}
+
+/* Table */
+.tbl{width:100%;border-collapse:collapse;font-size:12.5px}
+.tbl th{text-align:left;padding:9px 14px;background:var(--bg3);
+  border-bottom:1px solid var(--border);color:var(--muted);font-weight:600;
+  font-size:11px;text-transform:uppercase;letter-spacing:.04em}
+.tbl td{padding:9px 14px;border-bottom:1px solid var(--border);vertical-align:top}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:var(--bg3)}
+.fn{color:var(--blue);font-family:monospace}
+.cn{color:var(--purple);font-family:monospace;font-size:11px}
+
+/* Mermaid */
+.mbox{background:var(--bg2);border:1px solid var(--border);border-radius:8px;
+  padding:18px;margin-bottom:20px;overflow-x:auto}
+.mbox .mermaid{min-width:fit-content}
+
+/* Class cards */
+.cc{background:var(--bg2);border:1px solid var(--border);border-radius:8px;
+  overflow:hidden;margin-bottom:24px}
+.cc-hdr{display:flex;align-items:center;gap:12px;padding:14px 18px;
+  border-bottom:1px solid var(--border)}
+.cc-badge{font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;
+  text-transform:uppercase;letter-spacing:.05em;white-space:nowrap}
+.b-model{background:#1f3d6e;color:#58a6ff}
+.b-ctrl{background:#1a3a1a;color:#3fb950}
+.b-eng{background:#2d1a2d;color:#d2a8ff}
+.b-ui{background:#2d2a0a;color:#e3b341}
+.b-view{background:#2d1518;color:#f85149}
+.cc-name{font-family:monospace;font-size:17px;font-weight:700}
+.cc-file{margin-left:auto;font-size:11px;color:var(--muted);font-family:monospace}
+.cc-desc{padding:12px 18px;color:var(--muted);font-size:13px;
+  border-bottom:1px solid var(--border)}
+.cc-body{display:grid;grid-template-columns:1fr 1fr}
+@media(max-width:800px){.cc-body{grid-template-columns:1fr}}
+.cc-sect{padding:14px 18px}
+.cc-sect:first-child{border-right:1px solid var(--border)}
+.sect-ttl{font-size:10px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.06em;color:var(--muted);margin-bottom:9px}
+.mlist,.alist{list-style:none;padding:0}
+.mlist li,.alist li{padding:4px 0;border-bottom:1px solid var(--border);
+  font-size:12px;font-family:monospace;display:flex;align-items:baseline;gap:6px}
+.mlist li:last-child,.alist li:last-child{border-bottom:none}
+.mp{color:var(--green)} .mv{color:var(--muted)}
+.mr{margin-left:auto;color:var(--blue);font-size:11px}
+.at{color:var(--purple)} .an{color:var(--orange)}
+.cc-code{padding:14px 18px;border-top:1px solid var(--border)}
+
+/* Code */
+.cblock{background:#010409;border:1px solid var(--border);border-radius:6px;
+  overflow:hidden;margin:10px 0}
+.cblock pre{margin:0;padding:14px;overflow-x:auto;font-size:12.5px;line-height:1.5}
+
+/* Formula */
+.formula{background:var(--bg3);border:1px solid var(--border);border-radius:6px;
+  padding:14px;font-family:monospace;font-size:13px;color:var(--yellow);
+  margin:10px 0;white-space:pre-wrap}
+
+/* Flow sections */
+.flow-lbl{font-size:12px;color:var(--muted);margin-bottom:10px;padding-left:2px}
+
+::-webkit-scrollbar{width:7px;height:7px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+::-webkit-scrollbar-thumb:hover{background:#484f58}
+</style>
+</head>
+<body>
+
+<!-- ── Header ─────────────────────────────────────────── -->
+<div class="hdr">
+  <div class="hdr-top">
+    <span style="font-size:34px">🧊</span>
+    <h1>스마트 냉장고 프로젝트</h1>
+    <span class="badge">v2.0</span>
+    <span class="badge">Python 3.12</span>
+    <span class="badge">CustomTkinter</span>
+    <span class="badge">분석 문서 2026-05-28</span>
+  </div>
+  <p>냉장고 재고 관리 · 레시피 추천 · 소비 패턴 분석 · 장보기 자동화 GUI 시스템</p>
+</div>
+
+<!-- ── Stats ──────────────────────────────────────────── -->
+<div class="stats">
+  <div class="stat"><div class="stat-n">13</div><div class="stat-l">Python<br>파일</div></div>
+  <div class="stat"><div class="stat-n">11</div><div class="stat-l">OOP<br>클래스</div></div>
+  <div class="stat"><div class="stat-n">5</div><div class="stat-l">GUI<br>뷰</div></div>
+  <div class="stat"><div class="stat-n">3</div><div class="stat-l">아키텍처<br>레이어</div></div>
+  <div class="stat"><div class="stat-n">11</div><div class="stat-l">레시피<br>DB</div></div>
+  <div class="stat"><div class="stat-n">20</div><div class="stat-l">식재료<br>DB</div></div>
+  <div class="stat"><div class="stat-n" style="color:var(--green)">3</div><div class="stat-l">모달<br>다이얼로그</div></div>
+</div>
+
+<!-- ── Tabs ───────────────────────────────────────────── -->
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab('structure',this)">🏗️ 구조 설명</button>
+  <button class="tab-btn" onclick="switchTab('code',this)">🔬 코드 분석</button>
+  <button class="tab-btn" onclick="switchTab('flow',this)">🔀 흐름 시각화</button>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     Tab 1 — 구조 설명
+═══════════════════════════════════════════════════════ -->
+<div id="tab-structure" class="tab active">
+
+  <div class="sec">🏛️ 전체 아키텍처 — 레이어 구조</div>
+  <div class="layers">
+    <div class="layer">
+      <div class="lbl lbl-e">진입점</div>
+      <div>
+        <div class="chips"><span class="chip">main.py</span></div>
+        <div class="layer-note">CTk 라이트 테마 설정 → Fridge + SmartFridgeApp 생성 → mainloop()</div>
+      </div>
+    </div>
+    <div class="layer">
+      <div class="lbl lbl-g">GUI 레이어</div>
+      <div>
+        <div class="chips">
+          <span class="chip">gui/app.py</span>
+          <span class="chip">gui/dashboard_view.py</span>
+          <span class="chip">gui/inventory_view.py</span>
+          <span class="chip">gui/recipe_view.py</span>
+          <span class="chip">gui/analytics_view.py</span>
+          <span class="chip">gui/shopping_view.py</span>
+          <span class="chip">gui/dialogs.py</span>
+        </div>
+        <div class="layer-note">CustomTkinter 기반 뷰 / 윈도우 / 모달. 비즈니스 로직을 직접 포함하지 않고 Fridge 객체를 통해 데이터 접근</div>
+      </div>
+    </div>
+    <div class="layer">
+      <div class="lbl lbl-b">비즈니스 로직</div>
+      <div>
+        <div class="chips">
+          <span class="chip">fridge.py</span>
+          <span class="chip">ingredient.py</span>
+          <span class="chip">recommender.py</span>
+          <span class="chip">analytics.py</span>
+        </div>
+        <div class="layer-note">도메인 객체(Fridge, Ingredient) + 분석 함수 + 추천 엔진. GUI 의존성 없음</div>
+      </div>
+    </div>
+    <div class="layer">
+      <div class="lbl lbl-d">데이터 레이어</div>
+      <div>
+        <div class="chips"><span class="chip">database.py</span></div>
+        <div class="layer-note">순수 Python dict/list. JSON·DB 없이 인메모리 운용. EXPIRY_DB · NUTRITION_DB · RECIPE_DB</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">📋 각 모듈/파일 역할</div>
+  <div class="card">
+    <table class="tbl">
+      <thead>
+        <tr>
+          <th>파일</th><th>주요 클래스 / 함수</th><th>역할 요약</th><th>의존 모듈</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code class="fn">main.py</code></td>
+          <td><code class="cn">main()</code></td>
+          <td>앱 진입점. CTk 테마 설정 후 Fridge·App 인스턴스 생성</td>
+          <td><code class="fn">fridge, gui/app</code></td>
+        </tr>
+        <tr>
+          <td><code class="fn">ingredient.py</code></td>
+          <td><code class="cn">Ingredient</code></td>
+          <td>단일 식재료 모델. 유통기한 계산·임박 판정·영양 정보 조회</td>
+          <td><code class="fn">database</code></td>
+        </tr>
+        <tr>
+          <td><code class="fn">fridge.py</code></td>
+          <td><code class="cn">Fridge</code></td>
+          <td>냉장고 도메인 객체. 식재료 CRUD + 사용/폐기 이력 관리</td>
+          <td><code class="fn">ingredient, database</code></td>
+        </tr>
+        <tr>
+          <td><code class="fn">database.py</code></td>
+          <td><code class="cn">EXPIRY_DB · NUTRITION_DB · RECIPE_DB</code></td>
+          <td>식재료 유통기한·영양 정보(20종), 한국 가정식 레시피 11개를 순수 dict/list로 정의</td>
+          <td>없음 (최하위)</td>
+        </tr>
+        <tr>
+          <td><code class="fn">analytics.py</code></td>
+          <td><code class="cn">waste_rate · top_used · category_distribution · generate_shopping_list</code></td>
+          <td>소비 이력 분석 함수 모음. 폐기율·빈도 집계·카테고리 분포·자동 장보기 리스트</td>
+          <td><code class="fn">fridge, ingredient, database</code></td>
+        </tr>
+        <tr>
+          <td><code class="fn">recommender.py</code></td>
+          <td><code class="cn">RecipeRecommender</code></td>
+          <td>보유재료 비율 + 임박도 + 부족패널티 가중합으로 레시피 점수 계산 및 추천</td>
+          <td><code class="fn">fridge, database</code></td>
+        </tr>
+        <tr>
+          <td><code class="fn">gui/app.py</code></td>
+          <td><code class="cn">SmartFridgeApp</code></td>
+          <td>메인 윈도우(ctk.CTk 상속). 사이드바 네비게이션 + 5개 뷰 전환 관리</td>
+          <td><code class="fn">fridge, gui/*</code></td>
+        </tr>
+        <tr>
+          <td><code class="fn">gui/dashboard_view.py</code></td>
+          <td><code class="cn">DashboardView</code></td>
+          <td>통계 카드 4개 + 임박/만료 재료 상위 5개 + 오늘의 추천 요리</td>
+          <td><code class="fn">fridge, recommender, database</code></td>
+        </tr>
+        <tr>
+          <td><code class="fn">gui/inventory_view.py</code></td>
+          <td><code class="cn">InventoryView</code></td>
+          <td>ttk.Treeview 재고 테이블. 카테고리 필터·검색·추가/사용/폐기 버튼 툴바</td>
+          <td><code class="fn">fridge, gui/dialogs</code></td>
+        </tr>
+        <tr>
+          <td><code class="fn">gui/recipe_view.py</code></td>
+          <td><code class="cn">RecipeView</code></td>
+          <td>추천 레시피 TOP 3 카드. 보유율 프로그레스 바·재료 색상 구분·영양 정보</td>
+          <td><code class="fn">fridge, recommender, database</code></td>
+        </tr>
+        <tr>
+          <td><code class="fn">gui/analytics_view.py</code></td>
+          <td><code class="cn">AnalyticsView</code></td>
+          <td>폐기율 요약 카드 3개 + matplotlib 막대/파이 차트를 FigureCanvasTkAgg로 임베딩</td>
+          <td><code class="fn">fridge, analytics, ingredient</code></td>
+        </tr>
+        <tr>
+          <td><code class="fn">gui/shopping_view.py</code></td>
+          <td><code class="cn">ShoppingView</code></td>
+          <td>재고 부족·자주 쓰는 재료 자동 분석. 체크박스 리스트 + 쿠팡 검색 링크</td>
+          <td><code class="fn">fridge, analytics</code></td>
+        </tr>
+        <tr>
+          <td><code class="fn">gui/dialogs.py</code></td>
+          <td><code class="cn">_BaseDialog · AddIngredientDialog · UseIngredientDialog · RecipeDetailDialog</code></td>
+          <td>CTkToplevel 기반 모달 3종. 추가/사용/레시피 상세. 부모 창 중앙 자동 배치</td>
+          <td><code class="fn">fridge, database</code></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="sec">🗂️ OOP 클래스 다이어그램</div>
+  <div class="mbox">
+    <div class="mermaid">
+classDiagram
+    class Ingredient {
+        +str name
+        +float quantity
+        +str unit
+        +date purchase_date
+        +str category
+        +days_left() int
+        +is_expiring(threshold) bool
+        +get_nutrition() dict
+        +__str__() str
+    }
+    class Fridge {
+        +dict items
+        +list history
+        +add_ingredient(name, qty, unit, date)
+        +use_ingredient(name, qty)
+        +discard_ingredient(name)
+        +get_expiring(threshold) list
+        +get_expired() list
+        +get_low_stock(threshold) list
+        +search(keyword) list
+    }
+    class RecipeRecommender {
+        +score(recipe, fridge) float
+        +recommend(fridge, top_n) list
+        -_match_ratio(recipe, fridge) float
+        -_urgency(recipe, fridge) float
+        -_missing_penalty(recipe, fridge) float
+    }
+    class SmartFridgeApp {
+        +Fridge fridge
+        +dict views
+        +str current_view
+        +show_view(name)
+        -_build_sidebar()
+        -_build_content()
+        -_create_views()
+    }
+    class DashboardView {
+        +Fridge fridge
+        +refresh()
+        -_refresh_cards()
+        -_refresh_expiring()
+        -_refresh_recommendation()
+    }
+    class InventoryView {
+        +Fridge fridge
+        +refresh()
+        -_build_table()
+        -_open_add()
+        -_open_use()
+        -_discard_selected()
+    }
+    class RecipeView {
+        +Fridge fridge
+        +refresh()
+        -_make_card(col, recipe, score)
+        -_calc_nutrition(recipe) str
+        -_open_detail(recipe)
+    }
+    class AnalyticsView {
+        +Fridge fridge
+        +refresh()
+        -_refresh_summary()
+        -_refresh_charts()
+    }
+    class ShoppingView {
+        +Fridge fridge
+        +refresh()
+        -_make_item_row(row_idx, entry)
+        -_on_check(var, card)
+    }
+    class _BaseDialog {
+        -_center_and_grab()
+    }
+    class AddIngredientDialog {
+        +Fridge fridge
+        +callable on_success
+        -_on_add()
+    }
+    class UseIngredientDialog {
+        +Fridge fridge
+        +str name
+        -_on_use()
+    }
+    class RecipeDetailDialog {
+        +dict recipe
+    }
+
+    Fridge "1" *-- "0..*" Ingredient : items
+    SmartFridgeApp --> Fridge : owns
+    SmartFridgeApp *-- DashboardView
+    SmartFridgeApp *-- InventoryView
+    SmartFridgeApp *-- RecipeView
+    SmartFridgeApp *-- AnalyticsView
+    SmartFridgeApp *-- ShoppingView
+    DashboardView --> Fridge
+    DashboardView --> RecipeRecommender
+    InventoryView --> Fridge
+    RecipeView --> Fridge
+    RecipeView --> RecipeRecommender
+    AnalyticsView --> Fridge
+    ShoppingView --> Fridge
+    RecipeRecommender --> Fridge
+    _BaseDialog <|-- AddIngredientDialog
+    _BaseDialog <|-- UseIngredientDialog
+    _BaseDialog <|-- RecipeDetailDialog
+    AddIngredientDialog --> Fridge
+    UseIngredientDialog --> Fridge
+    InventoryView ..> AddIngredientDialog : opens
+    InventoryView ..> UseIngredientDialog : opens
+    RecipeView ..> RecipeDetailDialog : opens
+    </div>
+  </div>
+
+  <div class="sec">🔗 모듈 의존성 관계</div>
+  <div class="mbox">
+    <div class="mermaid">
+graph TD
+    MAIN["📄 main.py<br>진입점"] --> FRIDGE
+    MAIN --> APP
+    APP["🖥️ gui/app.py<br>SmartFridgeApp"] --> DASH & INV & REC & ANA & SHOP
+    DASH["🏠 dashboard_view"] --> FRIDGE & RECOMMENDER & DB
+    INV["📦 inventory_view"] --> FRIDGE
+    INV -.->|opens| DIALOGS
+    REC["🍳 recipe_view"] --> FRIDGE & RECOMMENDER & DB
+    REC -.->|opens| DIALOGS
+    ANA["📊 analytics_view"] --> FRIDGE & ANALYTICS & INGREDIENT
+    SHOP["🛒 shopping_view"] --> FRIDGE & ANALYTICS
+    DIALOGS["💬 dialogs.py<br>3종 모달"] --> FRIDGE & DB
+    FRIDGE["🧊 fridge.py<br>Fridge"] --> INGREDIENT & DB
+    INGREDIENT["🥕 ingredient.py<br>Ingredient"] --> DB
+    ANALYTICS["📈 analytics.py<br>분석 함수"] --> FRIDGE & INGREDIENT & DB
+    RECOMMENDER["🤖 recommender.py<br>RecipeRecommender"] --> FRIDGE & DB
+    DB["🗄️ database.py<br>EXPIRY_DB · NUTRITION_DB · RECIPE_DB"]
+
+    style MAIN fill:#2d2a0a,stroke:#e3b341,color:#e3b341
+    style DB fill:#1a1a2d,stroke:#58a6ff,color:#58a6ff
+    style FRIDGE fill:#1a2d1a,stroke:#3fb950,color:#3fb950
+    style INGREDIENT fill:#1a2d1a,stroke:#3fb950,color:#3fb950
+    style RECOMMENDER fill:#1a2d1a,stroke:#3fb950,color:#3fb950
+    style ANALYTICS fill:#1a2d1a,stroke:#3fb950,color:#3fb950
+    style APP fill:#2d1518,stroke:#f85149,color:#f85149
+    style DASH fill:#2d1518,stroke:#f85149,color:#f85149
+    style INV fill:#2d1518,stroke:#f85149,color:#f85149
+    style REC fill:#2d1518,stroke:#f85149,color:#f85149
+    style ANA fill:#2d1518,stroke:#f85149,color:#f85149
+    style SHOP fill:#2d1518,stroke:#f85149,color:#f85149
+    style DIALOGS fill:#2d1518,stroke:#f85149,color:#f85149
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     Tab 2 — 코드 분석
+═══════════════════════════════════════════════════════ -->
+<div id="tab-code" class="tab">
+
+  <div class="sec">🔬 핵심 클래스 5개 분석</div>
+
+  <!-- ── Class 1: Ingredient ── -->
+  <div class="cc">
+    <div class="cc-hdr">
+      <span class="cc-badge b-model">Model</span>
+      <span class="cc-name">Ingredient</span>
+      <span class="cc-file">ingredient.py</span>
+    </div>
+    <div class="cc-desc">
+      냉장고 내 단일 식재료를 표현하는 도메인 모델. 생성 시 <code>EXPIRY_DB</code>에서 카테고리를 자동 설정하며,
+      구매일 + 표준 유통기한으로 남은 일수를 동적 계산합니다.
+      DB 미등록 재료는 <code>days_left() → 999</code>를 반환해 유통기한 제약을 우회합니다.
+    </div>
+    <div class="cc-body">
+      <div class="cc-sect">
+        <div class="sect-ttl">Attributes</div>
+        <ul class="alist">
+          <li><span class="at">str</span>&nbsp;<span class="an">name</span></li>
+          <li><span class="at">float</span>&nbsp;<span class="an">quantity</span>&nbsp;— 양수 제약 (ValueError)</li>
+          <li><span class="at">str</span>&nbsp;<span class="an">unit</span>&nbsp;— g, L, 개, 대 …</li>
+          <li><span class="at">date</span>&nbsp;<span class="an">purchase_date</span>&nbsp;— 기본: 오늘</li>
+          <li><span class="at">str</span>&nbsp;<span class="an">category</span>&nbsp;— EXPIRY_DB 자동 설정</li>
+        </ul>
+      </div>
+      <div class="cc-sect">
+        <div class="sect-ttl">Methods</div>
+        <ul class="mlist">
+          <li><span class="mp">+ days_left()</span><span class="mr">→ int</span></li>
+          <li><span class="mp">+ is_expiring(threshold=3)</span><span class="mr">→ bool</span></li>
+          <li><span class="mp">+ get_nutrition()</span><span class="mr">→ dict</span></li>
+          <li><span class="mp">+ __str__()</span><span class="mr">→ str</span></li>
+        </ul>
+      </div>
+    </div>
+    <div class="cc-code">
+      <div class="sect-ttl">핵심 로직 — days_left() : 유통기한 계산</div>
+      <div class="cblock"><pre><code class="language-python">def days_left(self) -> int:
+    db_entry = EXPIRY_DB.get(self.name)
+    if db_entry is None:
+        return 999          # DB 미등록 → 유통기한 미적용
+
+    expiry_date = self.purchase_date + timedelta(days=db_entry["days"])
+    remaining   = (expiry_date - date.today()).days
+    return remaining        # 음수 = 이미 만료됨</code></pre></div>
+    </div>
+  </div>
+
+  <!-- ── Class 2: Fridge ── -->
+  <div class="cc">
+    <div class="cc-hdr">
+      <span class="cc-badge b-ctrl">Controller</span>
+      <span class="cc-name">Fridge</span>
+      <span class="cc-file">fridge.py</span>
+    </div>
+    <div class="cc-desc">
+      앱 전역에서 공유되는 핵심 도메인 객체. <code>items</code> dict로 식재료를 관리하고
+      모든 변경(사용/폐기)을 <code>history</code> 리스트에 기록합니다.
+      수량이 0이 되면 items에서 자동 삭제하는 자기 정리 패턴을 사용합니다.
+    </div>
+    <div class="cc-body">
+      <div class="cc-sect">
+        <div class="sect-ttl">Attributes</div>
+        <ul class="alist">
+          <li><span class="at">dict[str, Ingredient]</span>&nbsp;<span class="an">items</span></li>
+          <li><span class="at">list[dict]</span>&nbsp;<span class="an">history</span>&nbsp;— action·name·qty·date</li>
+        </ul>
+      </div>
+      <div class="cc-sect">
+        <div class="sect-ttl">Methods</div>
+        <ul class="mlist">
+          <li><span class="mp">+ add_ingredient(name, qty, unit, date)</span></li>
+          <li><span class="mp">+ use_ingredient(name, qty)</span></li>
+          <li><span class="mp">+ discard_ingredient(name)</span></li>
+          <li><span class="mp">+ get_expiring(threshold=3)</span><span class="mr">→ list</span></li>
+          <li><span class="mp">+ get_expired()</span><span class="mr">→ list</span></li>
+          <li><span class="mp">+ get_low_stock(threshold=1)</span><span class="mr">→ list</span></li>
+          <li><span class="mp">+ search(keyword)</span><span class="mr">→ list</span></li>
+        </ul>
+      </div>
+    </div>
+    <div class="cc-code">
+      <div class="sect-ttl">핵심 로직 — use_ingredient() : CRUD + 이력 기록 + 자동 삭제</div>
+      <div class="cblock"><pre><code class="language-python">def use_ingredient(self, name: str, qty: float) -> None:
+    if name not in self.items:           raise KeyError(...)
+    if qty <= 0:                         raise ValueError(...)
+    if qty > self.items[name].quantity:  raise ValueError(...)
+
+    self.items[name].quantity -= qty
+
+    self.history.append({               # 사용 이력 기록
+        "action": "used", "name": name,
+        "qty": qty, "date": date.today().isoformat(),
+    })
+
+    if self.items[name].quantity <= 0:  # 수량 0 → 자동 삭제
+        del self.items[name]</code></pre></div>
+    </div>
+  </div>
+
+  <!-- ── Class 3: RecipeRecommender ── -->
+  <div class="cc">
+    <div class="cc-hdr">
+      <span class="cc-badge b-eng">Engine</span>
+      <span class="cc-name">RecipeRecommender</span>
+      <span class="cc-file">recommender.py</span>
+    </div>
+    <div class="cc-desc">
+      3개의 서브 메트릭(보유 비율·임박도·부족 패널티)을 가중 합산해 레시피를 점수화하는 추천 엔진.
+      stateless 클래스(인스턴스 속성 없음)로 설계되어 여러 뷰에서 재사용됩니다.
+    </div>
+    <div class="cc-body">
+      <div class="cc-sect">
+        <div class="sect-ttl">Public API</div>
+        <ul class="mlist">
+          <li><span class="mp">+ score(recipe, fridge, w1, w2, w3)</span><span class="mr">→ float</span></li>
+          <li><span class="mp">+ recommend(fridge, top_n=3)</span><span class="mr">→ list[tuple]</span></li>
+          <li><span class="mp">+ print_recommendation(fridge, top_n)</span></li>
+        </ul>
+      </div>
+      <div class="cc-sect">
+        <div class="sect-ttl">내부 계산 메서드</div>
+        <ul class="mlist">
+          <li><span class="mv">- _match_ratio(recipe, fridge)</span><span class="mr">→ float</span></li>
+          <li><span class="mv">- _urgency(recipe, fridge)</span><span class="mr">→ float</span></li>
+          <li><span class="mv">- _missing_penalty(recipe, fridge)</span><span class="mr">→ float</span></li>
+        </ul>
+      </div>
+    </div>
+    <div class="cc-code">
+      <div class="sect-ttl">추천 점수 공식 (score formula)</div>
+      <div class="formula">score = 0.5 × match_ratio + 0.4 × urgency - 0.1 × missing_penalty
+
+  match_ratio    = 냉장고 보유 재료 수 / 레시피 전체 재료 수        (0~1)
+  urgency        = Σ max(0, 1 - days_left_i / 7) / 전체 재료 수
+                   → 7일 이내 임박할수록 urgency_i → 1.0
+                   → 만료 재료(days_left < 0)는 urgency_i = 0
+  missing_penalty = 부족 재료 수 / 레시피 전체 재료 수              (0~1)</div>
+      <div class="cblock"><pre><code class="language-python">def score(self, recipe, fridge, w1=0.5, w2=0.4, w3=0.1) -> float:
+    match   = self._match_ratio(recipe, fridge)
+    urgency = self._urgency(recipe, fridge)
+    penalty = self._missing_penalty(recipe, fridge)
+    return w1 * match + w2 * urgency - w3 * penalty
+
+def recommend(self, fridge, top_n=3) -> list[tuple]:
+    scored = [(r, self.score(r, fridge)) for r in RECIPE_DB]
+    return sorted(scored, key=lambda x: x[1], reverse=True)[:top_n]</code></pre></div>
+    </div>
+  </div>
+
+  <!-- ── Class 4: SmartFridgeApp ── -->
+  <div class="cc">
+    <div class="cc-hdr">
+      <span class="cc-badge b-ui">UI Main</span>
+      <span class="cc-name">SmartFridgeApp</span>
+      <span class="cc-file">gui/app.py</span>
+    </div>
+    <div class="cc-desc">
+      <code>ctk.CTk</code>를 상속한 메인 윈도우. 5개의 뷰 인스턴스를 단 한 번만 생성하고,
+      <code>grid()/grid_remove()</code>로 표시/숨김을 전환합니다.
+      뷰 전환마다 <code>refresh()</code>를 호출해 최신 Fridge 데이터를 반영합니다.
+    </div>
+    <div class="cc-body">
+      <div class="cc-sect">
+        <div class="sect-ttl">Attributes</div>
+        <ul class="alist">
+          <li><span class="at">Fridge</span>&nbsp;<span class="an">fridge</span>&nbsp;— 전역 공유 인스턴스</li>
+          <li><span class="at">dict[str, CTkFrame]</span>&nbsp;<span class="an">views</span></li>
+          <li><span class="at">str</span>&nbsp;<span class="an">current_view</span></li>
+          <li><span class="at">dict[str, CTkButton]</span>&nbsp;<span class="an">_nav_buttons</span></li>
+        </ul>
+      </div>
+      <div class="cc-sect">
+        <div class="sect-ttl">Methods</div>
+        <ul class="mlist">
+          <li><span class="mv">- _build_sidebar()</span></li>
+          <li><span class="mv">- _build_content()</span></li>
+          <li><span class="mv">- _create_views()</span>&nbsp;— 지연 import로 순환 방지</li>
+          <li><span class="mp">+ show_view(name)</span>&nbsp;— 뷰 전환 진입점</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cc-code">
+      <div class="sect-ttl">핵심 로직 — show_view() : grid 토글 뷰 전환 패턴</div>
+      <div class="cblock"><pre><code class="language-python">def show_view(self, name: str) -> None:
+    for view in self.views.values():
+        view.grid_remove()          # 레이아웃 정보 보존하며 숨김
+
+    self.views[name].grid()         # 선택된 뷰만 표시
+    self.views[name].refresh()      # 최신 Fridge 데이터로 UI 갱신
+    self.current_view = name
+
+    for k, btn in self._nav_buttons.items():
+        btn.configure(              # 활성 버튼 강조
+            fg_color=("gray75","gray25") if k == name else "transparent"
+        )</code></pre></div>
+    </div>
+  </div>
+
+  <!-- ── Class 5: AnalyticsView ── -->
+  <div class="cc">
+    <div class="cc-hdr">
+      <span class="cc-badge b-view">View</span>
+      <span class="cc-name">AnalyticsView</span>
+      <span class="cc-file">gui/analytics_view.py</span>
+    </div>
+    <div class="cc-desc">
+      <code>matplotlib</code>의 Figure(막대 + 파이 차트)를 <code>FigureCanvasTkAgg</code>로
+      CTkFrame에 직접 임베딩합니다. 새로고침 시 이전 Figure를 <code>plt.close()</code>로
+      해제해 메모리 누수를 방지하는 패턴을 사용합니다.
+    </div>
+    <div class="cc-body">
+      <div class="cc-sect">
+        <div class="sect-ttl">Attributes</div>
+        <ul class="alist">
+          <li><span class="at">Fridge</span>&nbsp;<span class="an">fridge</span></li>
+          <li><span class="at">FigureCanvasTkAgg|None</span>&nbsp;<span class="an">_canvas</span></li>
+          <li><span class="at">Figure|None</span>&nbsp;<span class="an">_fig</span></li>
+        </ul>
+      </div>
+      <div class="cc-sect">
+        <div class="sect-ttl">Methods</div>
+        <ul class="mlist">
+          <li><span class="mp">+ refresh()</span></li>
+          <li><span class="mv">- _refresh_summary()</span>&nbsp;— 폐기율 카드 3개</li>
+          <li><span class="mv">- _refresh_charts()</span>&nbsp;— 막대 + 파이 차트</li>
+          <li><span class="mv">- _make_summary_card(...)</span></li>
+          <li><span class="mv">- _build_header()</span></li>
+          <li><span class="mv">- _build_chart_frame()</span></li>
+        </ul>
+      </div>
+    </div>
+    <div class="cc-code">
+      <div class="sect-ttl">핵심 로직 — _refresh_charts() : matplotlib 임베딩 패턴</div>
+      <div class="cblock"><pre><code class="language-python">def _refresh_charts(self) -> None:
+    # 기존 캔버스·Figure 해제 (메모리 누수 방지)
+    if self._canvas is not None:
+        self._canvas.get_tk_widget().destroy()
+        self._canvas = None
+    if self._fig is not None:
+        plt.close(self._fig)        # matplotlib Figure 메모리 해제
+        self._fig = None
+
+    # 새 Figure 생성 (2-subplot: 막대 + 파이)
+    self._fig = Figure(figsize=(10, 3.8), dpi=90, facecolor="#FFFFFF")
+    ax1 = self._fig.add_subplot(1, 2, 1)   # 사용 빈도 Top 5
+    ax2 = self._fig.add_subplot(1, 2, 2)   # 카테고리 파이
+
+    # TkAgg 캔버스로 CTkFrame에 임베딩
+    self._canvas = FigureCanvasTkAgg(self._fig, master=self._chart_frame)
+    self._canvas.draw()
+    self._canvas.get_tk_widget().grid(row=0, column=0, sticky="nswe")</code></pre></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     Tab 3 — 흐름 시각화
+═══════════════════════════════════════════════════════ -->
+<div id="tab-flow" class="tab">
+
+  <!-- 1. 프로그램 실행 흐름 -->
+  <div class="sec">▶️ 프로그램 실행 흐름</div>
+  <div class="flow-lbl">main.py 진입 → Fridge 초기화 → GUI 구성 → 이벤트 루프 진입</div>
+  <div class="mbox">
+    <div class="mermaid">
+flowchart TD
+    START([🚀 python main.py]) --> THEME[CTk 라이트 테마 설정]
+    THEME --> FRIDGE["Fridge 인스턴스 생성<br>get_sample_fridge 12종 로드"]
+    FRIDGE --> APP["SmartFridgeApp 초기화<br>1100×700 윈도우"]
+    APP --> SB[사이드바 구성<br>5개 네비게이션 버튼]
+    APP --> CT[콘텐츠 영역 구성<br>grid col=1]
+    SB & CT --> VIEWS["5개 View 인스턴스 생성<br>Dashboard·Inventory·Recipe·Analytics·Shopping"]
+    VIEWS --> SHOW[show_view dashboard]
+    SHOW --> LOOP[🔄 app.mainloop<br>이벤트 루프]
+
+    LOOP --> USER{사용자 액션}
+
+    USER -->|사이드바 클릭| SWITCH["show_view name<br>전체 뷰 grid_remove<br>선택 뷰 grid + refresh"]
+    SWITCH --> LOOP
+
+    USER -->|➕ 추가 버튼| ADDDLG[AddIngredientDialog<br>입력 폼 모달]
+    ADDDLG --> ADDOK["fridge.add_ingredient<br>동일 이름: 수량 합산·날짜 갱신<br>신규: Ingredient 생성"]
+    ADDOK --> RF1[InventoryView.refresh<br>테이블 재렌더링]
+    RF1 --> LOOP
+
+    USER -->|🍴 사용 버튼| USEDLG[UseIngredientDialog<br>수량 차감 입력]
+    USEDLG --> USEOK["fridge.use_ingredient<br>history에 used 기록<br>수량 0이면 자동 삭제"]
+    USEOK --> RF1
+
+    USER -->|🗑️ 폐기 버튼| DISC["fridge.discard_ingredient<br>history에 discarded 기록"]
+    DISC --> RF1
+
+    USER -->|📖 레시피 보기| RECDLG[RecipeDetailDialog<br>조리법 스크롤 팝업]
+    RECDLG --> LOOP
+
+    USER -->|🛒 쿠팡 버튼| BROWSER["webbrowser.open<br>쿠팡 검색 URL"]
+    BROWSER --> LOOP
+
+    style START fill:#2d2a0a,stroke:#e3b341,color:#e3b341
+    style LOOP fill:#1a2d1a,stroke:#3fb950,color:#3fb950
+    style USER fill:#1f3d6e,stroke:#58a6ff,color:#58a6ff
+    </div>
+  </div>
+
+  <!-- 2. 레시피 추천 스코어링 흐름 -->
+  <div class="sec">🍳 레시피 추천 스코어링 흐름</div>
+  <div class="flow-lbl">RecipeRecommender.recommend() 내부 3단계 계산 과정</div>
+  <div class="mbox">
+    <div class="mermaid">
+flowchart LR
+    FRIDGE["🧊 Fridge.items<br>현재 재고"] --> MR & UP & MP
+    RECIPE["📖 RECIPE_DB<br>레시피 목록"] --> MR & UP & MP
+
+    MR["① match_ratio<br>보유 재료 수 ÷ 전체 재료 수<br>0.0 ~ 1.0"]
+    UP["② urgency<br>Σ max(0, 1 - days/7) ÷ N<br>임박도 평균 0.0~1.0"]
+    MP["③ missing_penalty<br>없는 재료 수 ÷ 전체 재료 수<br>0.0 ~ 1.0"]
+
+    MR -->|"× 0.5"| SCORE
+    UP -->|"× 0.4"| SCORE
+    MP -->|"× 0.1 (빼기)"| SCORE
+
+    SCORE["🎯 score<br>= 0.5×match<br>+ 0.4×urgency<br>− 0.1×penalty"]
+
+    SCORE --> SORT["모든 레시피 점수 계산<br>내림차순 정렬"]
+    SORT --> TOPN["Top N 반환<br>기본 top_n = 3"]
+
+    style SCORE fill:#1f3d6e,stroke:#58a6ff,color:#58a6ff
+    style TOPN fill:#1a2d1a,stroke:#3fb950,color:#3fb950
+    </div>
+  </div>
+
+  <!-- 3. 데이터 흐름도 -->
+  <div class="sec">📊 데이터 흐름도</div>
+  <div class="flow-lbl">정적 DB → 비즈니스 로직 → GUI 뷰로 흐르는 전체 데이터 경로</div>
+  <div class="mbox">
+    <div class="mermaid">
+graph LR
+    subgraph DATA["🗄️ 데이터 레이어 (database.py)"]
+        EDB["EXPIRY_DB<br>20종 유통기한+카테고리"]
+        NDB["NUTRITION_DB<br>100g 기준 영양 정보"]
+        RDB["RECIPE_DB<br>레시피 11개"]
+    end
+    subgraph LOGIC["⚙️ 비즈니스 로직"]
+        ING["Ingredient<br>유통기한 계산<br>임박 판정"]
+        FR["Fridge<br>CRUD<br>이력 관리"]
+        RC["RecipeRecommender<br>점수 계산 Top N"]
+        AN["analytics.py<br>폐기율·빈도·장보기"]
+    end
+    subgraph GUI["🖥️ GUI 레이어"]
+        DASH["DashboardView<br>통계카드·임박목록·추천"]
+        INV2["InventoryView<br>Treeview 테이블"]
+        REC2["RecipeView<br>Top3 카드·영양"]
+        ANA2["AnalyticsView<br>matplotlib 차트"]
+        SHOP2["ShoppingView<br>체크박스·쿠팡링크"]
+    end
+
+    EDB --> ING --> FR
+    EDB --> FR
+    NDB --> ING
+    RDB --> RC
+    FR --> RC
+    FR --> AN
+    NDB --> RC
+    FR --> DASH & INV2 & REC2 & ANA2 & SHOP2
+    RC --> DASH & REC2
+    AN --> ANA2 & SHOP2
+
+    style DATA fill:#1a1a2d,stroke:#58a6ff
+    style LOGIC fill:#1a2d1a,stroke:#3fb950
+    style GUI fill:#2d1518,stroke:#f85149
+    </div>
+  </div>
+
+  <!-- 4. View 전환 시퀀스 -->
+  <div class="sec">🔄 View 전환 시퀀스</div>
+  <div class="flow-lbl">사이드바 클릭 → grid 토글 → refresh() → 화면 갱신</div>
+  <div class="mbox">
+    <div class="mermaid">
+sequenceDiagram
+    actor User as 👤 사용자
+    participant App as SmartFridgeApp
+    participant OV as 이전 View
+    participant NV as 새 View
+    participant FR as Fridge
+
+    User->>App: 사이드바 버튼 클릭 (예: 📊 통계)
+    App->>App: show_view("analytics")
+    loop 모든 뷰
+        App->>OV: grid_remove() 숨김
+    end
+    App->>NV: grid() 표시
+    App->>NV: refresh()
+    NV->>FR: items, history 읽기
+    FR-->>NV: 최신 데이터 반환
+    NV->>NV: UI 위젯 재렌더링
+    NV-->>User: 화면 갱신 완료
+    App->>App: 활성 버튼 fg_color 강조
+    </div>
+  </div>
+
+  <!-- 5. 식재료 추가 시퀀스 -->
+  <div class="sec">➕ 식재료 추가 시퀀스</div>
+  <div class="flow-lbl">AddIngredientDialog → fridge.add_ingredient() → InventoryView 갱신</div>
+  <div class="mbox">
+    <div class="mermaid">
+sequenceDiagram
+    actor User as 👤 사용자
+    participant Inv as InventoryView
+    participant Dlg as AddIngredientDialog
+    participant FR as Fridge
+    participant Ing as Ingredient
+
+    User->>Inv: ➕ 추가 버튼 클릭
+    Inv->>Dlg: AddIngredientDialog(fridge, on_success=refresh)
+    Dlg-->>User: 모달 다이얼로그 표시
+
+    User->>Dlg: 이름·수량·단위·날짜 입력 후 [추가]
+    Dlg->>Dlg: 입력값 검증 (이름·수량·날짜 형식)
+
+    alt 동일 이름 재료 존재
+        Dlg->>FR: add_ingredient → 수량 합산 + 구매일 갱신
+    else 새 재료
+        Dlg->>FR: add_ingredient
+        FR->>Ing: new Ingredient(name, qty, unit, date)
+        Ing->>Ing: EXPIRY_DB 참조 → category 자동 설정
+    end
+
+    Dlg->>Inv: on_success callback 호출
+    Inv->>FR: items 재조회
+    FR-->>Inv: 갱신된 재고 목록
+    Inv->>Inv: Treeview 전체 재렌더링
+    Dlg->>Dlg: destroy() 닫힘
+    Inv-->>User: 테이블 갱신 완료
+    </div>
+  </div>
+
+  <!-- 6. 장보기 리스트 생성 흐름 -->
+  <div class="sec">🛒 장보기 리스트 생성 흐름</div>
+  <div class="flow-lbl">analytics.generate_shopping_list() 선정 기준 2가지</div>
+  <div class="mbox">
+    <div class="mermaid">
+flowchart TD
+    START([generate_shopping_list 호출]) --> C1 & C2
+
+    C1["기준 ① 재고 부족<br>fridge.items에서<br>quantity ≤ 1 인 재료"]
+    C2["기준 ② 자주 쓰는 재료<br>top_used 상위 5개 중<br>재고 없거나 quantity ≤ 1"]
+
+    C1 --> MERGE["중복 제거 dict 병합<br>key = 재료명"]
+    C2 --> MERGE
+
+    MERGE --> LINK["각 항목에 쿠팡 검색 URL 추가<br>COUPANG_SEARCH.format(name)"]
+    LINK --> RESULT["list[dict] 반환<br>name · reason · link"]
+
+    RESULT --> VIEW["ShoppingView에서<br>체크박스 카드로 렌더링"]
+    VIEW --> BTN["🛒 쿠팡 버튼 클릭<br>webbrowser.open(url)"]
+
+    style START fill:#2d2a0a,stroke:#e3b341,color:#e3b341
+    style RESULT fill:#1f3d6e,stroke:#58a6ff,color:#58a6ff
+    </div>
+  </div>
+
+</div>
+
+<!-- ── Scripts ─────────────────────────────────────────── -->
+<script>
+mermaid.initialize({
+  startOnLoad: true,
+  theme: 'dark',
+  themeVariables: {
+    primaryColor: '#1f3d6e',
+    primaryTextColor: '#e6edf3',
+    primaryBorderColor: '#30363d',
+    lineColor: '#8b949e',
+    secondaryColor: '#21262d',
+    tertiaryColor: '#161b22',
+    background: '#0d1117',
+    mainBkg: '#161b22',
+    nodeBorder: '#30363d',
+    clusterBkg: '#21262d',
+    titleColor: '#e6edf3',
+    edgeLabelBackground: '#21262d',
+    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', monospace",
+  },
+  flowchart: { curve: 'basis', padding: 20 },
+  sequence: { actorMargin: 60 },
+});
+
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('pre code').forEach(el => hljs.highlightElement(el));
+});
+</script>
+</body>
+</html>
