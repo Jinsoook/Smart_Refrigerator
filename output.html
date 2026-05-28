@@ -316,125 +316,194 @@ code{font-family:'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace}
   </div>
 
   <div class="sec">🗂️ OOP 클래스 다이어그램</div>
-  <div class="mbox">
-    <div class="mermaid">
-classDiagram
-    class Ingredient {"
-        +str name
-        +float quantity
-        +str unit
-        +date purchase_date
-        +str category
-        +days_left  int
-        +is_expiring threshold bool
-        +get_nutrition  dict
-        +__str__  str
-    "}
-    class Fridge {"
-        +dict items
-        +list history
-        +add_ingredient name, qty, unit, date
-        +use_ingredient name, qty
-        +discard_ingredient name
-        +get_expiring threshold list
-        +get_expired  list
-        +get_low_stock threshold list
-        +search keyword list
-    "}
-    class RecipeRecommender {"
-        +score recipe, fridge float
-        +recommend fridge, top_n list
-        -_match_ratio recipe, fridge float
-        -_urgency recipe, fridge float
-        -_missing_penalty recipe, fridge float
-    "}
-    class SmartFridgeApp {"
-        +Fridge fridge
-        +dict views
-        +str current_view
-        +show_view name
-        -_build_sidebar 
-        -_build_content 
-        -_create_views 
-    "}
-    class DashboardView {"
-        +Fridge fridge
-        +refresh 
-        -_refresh_cards 
-        -_refresh_expiring 
-        -_refresh_recommendation 
-    "}
-    class InventoryView {"
-        +Fridge fridge
-        +refresh 
-        -_build_table 
-        -_open_add 
-        -_open_use 
-        -_discard_selected 
-    "}
-    class RecipeView {"
-        +Fridge fridge
-        +refresh 
-        -_make_card col, recipe, score
-        -_calc_nutrition recipe str
-        -_open_detail recipe
-    "}
-    class AnalyticsView {"
-        +Fridge fridge
-        +refresh 
-        -_refresh_summary 
-        -_refresh_charts 
-    "}
-    class ShoppingView {"
-        +Fridge fridge
-        +refresh 
-        -_make_item_row row_idx, entry
-        -_on_check var, card
-    "}
-    class _BaseDialog {"
-        -_center_and_grab 
-    "}
-    class AddIngredientDialog {"
-        +Fridge fridge
-        +callable on_success
-        -_on_add 
-    "}
-    class UseIngredientDialog {"
-        +Fridge fridge
-        +str name
-        -_on_use 
-    "}
-    class RecipeDetailDialog {"
-        +dict recipe
-    "}
+  <div class="mbox" style="overflow-x:auto">
+  <style>
+  .cls-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+  .cls-card{border:1px solid var(--border);border-radius:7px;overflow:hidden;font-size:12px}
+  .cls-hdr{display:flex;align-items:center;gap:8px;padding:9px 12px;border-bottom:1px solid var(--border)}
+  .cls-name{font-family:monospace;font-size:14px;font-weight:700}
+  .cls-body{display:grid;grid-template-columns:1fr 1fr}
+  .cls-sect{padding:9px 12px}
+  .cls-sect:first-child{border-right:1px solid var(--border)}
+  .cls-ttl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:6px}
+  .cls-item{font-family:monospace;font-size:11px;padding:2px 0;border-bottom:1px solid #21262d;display:flex;gap:4px}
+  .cls-item:last-child{border-bottom:none}
+  .pub{color:#3fb950}.prv{color:#8b949e}.ret{margin-left:auto;color:#58a6ff;font-size:10px}
+  .cls-rel{margin-top:12px;border:1px solid var(--border);border-radius:7px;overflow:hidden}
+  .cls-rel table{width:100%;border-collapse:collapse;font-size:12px}
+  .cls-rel th{background:var(--bg3);padding:7px 12px;text-align:left;font-size:11px;color:var(--muted);font-weight:600;border-bottom:1px solid var(--border)}
+  .cls-rel td{padding:7px 12px;border-bottom:1px solid var(--border);font-family:monospace;font-size:11px}
+  .cls-rel tr:last-child td{border-bottom:none}
+  </style>
+  <div class="cls-grid">
 
-    Fridge "1" *-- "0..*" Ingredient : items
-    SmartFridgeApp --> Fridge : owns
-    SmartFridgeApp *-- DashboardView
-    SmartFridgeApp *-- InventoryView
-    SmartFridgeApp *-- RecipeView
-    SmartFridgeApp *-- AnalyticsView
-    SmartFridgeApp *-- ShoppingView
-    DashboardView --> Fridge
-    DashboardView --> RecipeRecommender
-    InventoryView --> Fridge
-    RecipeView --> Fridge
-    RecipeView --> RecipeRecommender
-    AnalyticsView --> Fridge
-    ShoppingView --> Fridge
-    RecipeRecommender --> Fridge
-    _BaseDialog <|-- AddIngredientDialog
-    _BaseDialog <|-- UseIngredientDialog
-    _BaseDialog <|-- RecipeDetailDialog
-    AddIngredientDialog --> Fridge
-    UseIngredientDialog --> Fridge
-    InventoryView ..> AddIngredientDialog : opens
-    InventoryView ..> UseIngredientDialog : opens
-    RecipeView ..> RecipeDetailDialog : opens
+    <div class="cls-card">
+      <div class="cls-hdr" style="background:#1f3040"><span class="cc-badge b-model">Model</span><span class="cls-name">Ingredient</span><span style="margin-left:auto;font-size:10px;color:var(--muted)">ingredient.py</span></div>
+      <div class="cls-body">
+        <div class="cls-sect"><div class="cls-ttl">Attributes</div>
+          <div class="cls-item"><span class="pub">+</span>str name</div>
+          <div class="cls-item"><span class="pub">+</span>float quantity</div>
+          <div class="cls-item"><span class="pub">+</span>str unit</div>
+          <div class="cls-item"><span class="pub">+</span>date purchase_date</div>
+          <div class="cls-item"><span class="pub">+</span>str category</div>
+        </div>
+        <div class="cls-sect"><div class="cls-ttl">Methods</div>
+          <div class="cls-item"><span class="pub">+</span>days_left<span class="ret">int</span></div>
+          <div class="cls-item"><span class="pub">+</span>is_expiring<span class="ret">bool</span></div>
+          <div class="cls-item"><span class="pub">+</span>get_nutrition<span class="ret">dict</span></div>
+          <div class="cls-item"><span class="pub">+</span>__str__<span class="ret">str</span></div>
+        </div>
+      </div>
     </div>
+
+    <div class="cls-card">
+      <div class="cls-hdr" style="background:#1f3040"><span class="cc-badge b-model">Model</span><span class="cls-name">Fridge</span><span style="margin-left:auto;font-size:10px;color:var(--muted)">fridge.py</span></div>
+      <div class="cls-body">
+        <div class="cls-sect"><div class="cls-ttl">Attributes</div>
+          <div class="cls-item"><span class="pub">+</span>dict items</div>
+          <div class="cls-item"><span class="pub">+</span>list history</div>
+        </div>
+        <div class="cls-sect"><div class="cls-ttl">Methods</div>
+          <div class="cls-item"><span class="pub">+</span>add_ingredient</div>
+          <div class="cls-item"><span class="pub">+</span>use_ingredient</div>
+          <div class="cls-item"><span class="pub">+</span>discard_ingredient</div>
+          <div class="cls-item"><span class="pub">+</span>get_expiring</div>
+          <div class="cls-item"><span class="pub">+</span>get_expired</div>
+          <div class="cls-item"><span class="pub">+</span>get_low_stock</div>
+          <div class="cls-item"><span class="pub">+</span>search</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cls-card">
+      <div class="cls-hdr" style="background:#1a2d1a"><span class="cc-badge b-eng">Engine</span><span class="cls-name">RecipeRecommender</span><span style="margin-left:auto;font-size:10px;color:var(--muted)">recommender.py</span></div>
+      <div class="cls-body">
+        <div class="cls-sect"><div class="cls-ttl">Public</div>
+          <div class="cls-item"><span class="pub">+</span>score<span class="ret">float</span></div>
+          <div class="cls-item"><span class="pub">+</span>recommend<span class="ret">list</span></div>
+        </div>
+        <div class="cls-sect"><div class="cls-ttl">Private</div>
+          <div class="cls-item"><span class="prv">-</span>_match_ratio</div>
+          <div class="cls-item"><span class="prv">-</span>_urgency</div>
+          <div class="cls-item"><span class="prv">-</span>_missing_penalty</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cls-card">
+      <div class="cls-hdr" style="background:#2d1518"><span class="cc-badge b-view">App</span><span class="cls-name">SmartFridgeApp</span><span style="margin-left:auto;font-size:10px;color:var(--muted)">gui/app.py</span></div>
+      <div class="cls-body">
+        <div class="cls-sect"><div class="cls-ttl">Attributes</div>
+          <div class="cls-item"><span class="pub">+</span>Fridge fridge</div>
+          <div class="cls-item"><span class="pub">+</span>dict views</div>
+          <div class="cls-item"><span class="pub">+</span>str current_view</div>
+        </div>
+        <div class="cls-sect"><div class="cls-ttl">Methods</div>
+          <div class="cls-item"><span class="pub">+</span>show_view</div>
+          <div class="cls-item"><span class="prv">-</span>_build_sidebar</div>
+          <div class="cls-item"><span class="prv">-</span>_build_content</div>
+          <div class="cls-item"><span class="prv">-</span>_create_views</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cls-card">
+      <div class="cls-hdr" style="background:#2d1518"><span class="cc-badge b-view">View</span><span class="cls-name">DashboardView</span></div>
+      <div class="cls-body">
+        <div class="cls-sect"><div class="cls-ttl">Attributes</div><div class="cls-item"><span class="pub">+</span>Fridge fridge</div></div>
+        <div class="cls-sect"><div class="cls-ttl">Methods</div>
+          <div class="cls-item"><span class="pub">+</span>refresh</div>
+          <div class="cls-item"><span class="prv">-</span>_refresh_cards</div>
+          <div class="cls-item"><span class="prv">-</span>_refresh_expiring</div>
+          <div class="cls-item"><span class="prv">-</span>_refresh_recommendation</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cls-card">
+      <div class="cls-hdr" style="background:#2d1518"><span class="cc-badge b-view">View</span><span class="cls-name">InventoryView</span></div>
+      <div class="cls-body">
+        <div class="cls-sect"><div class="cls-ttl">Attributes</div><div class="cls-item"><span class="pub">+</span>Fridge fridge</div></div>
+        <div class="cls-sect"><div class="cls-ttl">Methods</div>
+          <div class="cls-item"><span class="pub">+</span>refresh</div>
+          <div class="cls-item"><span class="prv">-</span>_build_table</div>
+          <div class="cls-item"><span class="prv">-</span>_open_add</div>
+          <div class="cls-item"><span class="prv">-</span>_open_use</div>
+          <div class="cls-item"><span class="prv">-</span>_discard_selected</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cls-card">
+      <div class="cls-hdr" style="background:#2d1518"><span class="cc-badge b-view">View</span><span class="cls-name">RecipeView</span></div>
+      <div class="cls-body">
+        <div class="cls-sect"><div class="cls-ttl">Attributes</div><div class="cls-item"><span class="pub">+</span>Fridge fridge</div></div>
+        <div class="cls-sect"><div class="cls-ttl">Methods</div>
+          <div class="cls-item"><span class="pub">+</span>refresh</div>
+          <div class="cls-item"><span class="prv">-</span>_make_card</div>
+          <div class="cls-item"><span class="prv">-</span>_calc_nutrition</div>
+          <div class="cls-item"><span class="prv">-</span>_open_detail</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cls-card">
+      <div class="cls-hdr" style="background:#2d1518"><span class="cc-badge b-view">View</span><span class="cls-name">AnalyticsView</span></div>
+      <div class="cls-body">
+        <div class="cls-sect"><div class="cls-ttl">Attributes</div><div class="cls-item"><span class="pub">+</span>Fridge fridge</div></div>
+        <div class="cls-sect"><div class="cls-ttl">Methods</div>
+          <div class="cls-item"><span class="pub">+</span>refresh</div>
+          <div class="cls-item"><span class="prv">-</span>_refresh_summary</div>
+          <div class="cls-item"><span class="prv">-</span>_refresh_charts</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cls-card">
+      <div class="cls-hdr" style="background:#2d1518"><span class="cc-badge b-view">View</span><span class="cls-name">ShoppingView</span></div>
+      <div class="cls-body">
+        <div class="cls-sect"><div class="cls-ttl">Attributes</div><div class="cls-item"><span class="pub">+</span>Fridge fridge</div></div>
+        <div class="cls-sect"><div class="cls-ttl">Methods</div>
+          <div class="cls-item"><span class="pub">+</span>refresh</div>
+          <div class="cls-item"><span class="prv">-</span>_make_item_row</div>
+          <div class="cls-item"><span class="prv">-</span>_on_check</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cls-card" style="grid-column:span 2">
+      <div class="cls-hdr" style="background:#1c1c2d"><span class="cc-badge" style="background:#1c2d40;color:#58a6ff">Dialog</span><span class="cls-name">_BaseDialog</span><span style="font-size:11px;color:var(--muted);margin-left:8px">← AddIngredientDialog / UseIngredientDialog / RecipeDetailDialog</span></div>
+      <div class="cls-body">
+        <div class="cls-sect"><div class="cls-ttl">_BaseDialog</div>
+          <div class="cls-item"><span class="prv">-</span>_center_and_grab</div>
+        </div>
+        <div class="cls-sect"><div class="cls-ttl">서브클래스 추가 멤버</div>
+          <div class="cls-item"><span class="pub">+</span>Fridge fridge (Add/Use)</div>
+          <div class="cls-item"><span class="pub">+</span>callable on_success (Add)</div>
+          <div class="cls-item"><span class="pub">+</span>str name (Use)</div>
+          <div class="cls-item"><span class="prv">-</span>_on_add / _on_use</div>
+        </div>
+      </div>
+    </div>
+
   </div>
 
-  <div class="sec">🔗 모듈 의존성 관계</div>
+  <div class="cls-rel">
+    <table>
+      <thead><tr><th>관계</th><th>From</th><th>To</th><th>설명</th></tr></thead>
+      <tbody>
+        <tr><td>Composition *--</td><td>Fridge</td><td>Ingredient (0..*)</td><td>items dict에 포함</td></tr>
+        <tr><td>Association --></td><td>SmartFridgeApp</td><td>Fridge</td><td>owns — 앱 전체에 하나</td></tr>
+        <tr><td>Composition *--</td><td>SmartFridgeApp</td><td>5개 View</td><td>내부 생성·관리</td></tr>
+        <tr><td>Dependency ..></td><td>InventoryView</td><td>Add/UseIngredientDialog</td><td>opens</td></tr>
+        <tr><td>Dependency ..></td><td>RecipeView</td><td>RecipeDetailDialog</td><td>opens</td></tr>
+        <tr><td>Inheritance &lt;|--</td><td>_BaseDialog</td><td>3종 Dialog</td><td>팝업 공통 기반</td></tr>
+      </tbody>
+    </table>
+  </div>
+  </div>
+
+<div class="sec">🔗 모듈 의존성 관계</div>
   <div class="mbox">
     <div class="mermaid">
 graph TD
