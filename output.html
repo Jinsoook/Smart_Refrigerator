@@ -746,36 +746,36 @@ def recommend(self, fridge, top_n=3) -> list[tuple]:
   <div class="mbox">
     <div class="mermaid">
 flowchart TD
-    START([🚀 python main.py]) --> THEME[CTk 라이트 테마 설정]
+    START(["python main.py 실행"]) --> THEME["CTk 라이트 테마 설정"]
     THEME --> FRIDGE["Fridge 인스턴스 생성<br>get_sample_fridge 12종 로드"]
-    FRIDGE --> APP["SmartFridgeApp 초기화<br>1100×700 윈도우"]
-    APP --> SB[사이드바 구성<br>5개 네비게이션 버튼]
-    APP --> CT[콘텐츠 영역 구성<br>grid col=1]
-    SB & CT --> VIEWS["5개 View 인스턴스 생성<br>Dashboard·Inventory·Recipe·Analytics·Shopping"]
-    VIEWS --> SHOW[show_view dashboard]
-    SHOW --> LOOP[🔄 app.mainloop<br>이벤트 루프]
+    FRIDGE --> APP["SmartFridgeApp 초기화<br>1100x700 윈도우"]
+    APP --> SB["사이드바 구성<br>5개 네비게이션 버튼"]
+    APP --> CT["콘텐츠 영역 구성<br>grid col=1"]
+    SB & CT --> VIEWS["5개 View 인스턴스 생성<br>Dashboard / Inventory / Recipe / Analytics / Shopping"]
+    VIEWS --> SHOW["show_view('dashboard')"]
+    SHOW --> LOOP["app.mainloop - 이벤트 루프"]
 
     LOOP --> USER{사용자 액션}
 
-    USER -->|사이드바 클릭| SWITCH["show_view name<br>전체 뷰 grid_remove<br>선택 뷰 grid + refresh"]
+    USER -->|"사이드바 클릭"| SWITCH["show_view(name)<br>전체 뷰 grid_remove<br>선택 뷰 grid + refresh"]
     SWITCH --> LOOP
 
-    USER -->|➕ 추가 버튼| ADDDLG[AddIngredientDialog<br>입력 폼 모달]
-    ADDDLG --> ADDOK["fridge.add_ingredient<br>동일 이름: 수량 합산·날짜 갱신<br>신규: Ingredient 생성"]
-    ADDOK --> RF1[InventoryView.refresh<br>테이블 재렌더링]
+    USER -->|"추가 버튼"| ADDDLG["AddIngredientDialog<br>입력 폼 모달"]
+    ADDDLG --> ADDOK["fridge.add_ingredient<br>동일 이름: 수량 합산 / 날짜 갱신<br>신규: Ingredient 생성"]
+    ADDOK --> RF1["InventoryView.refresh<br>테이블 재렌더링"]
     RF1 --> LOOP
 
-    USER -->|🍴 사용 버튼| USEDLG[UseIngredientDialog<br>수량 차감 입력]
+    USER -->|"사용 버튼"| USEDLG["UseIngredientDialog<br>수량 차감 입력"]
     USEDLG --> USEOK["fridge.use_ingredient<br>history에 used 기록<br>수량 0이면 자동 삭제"]
     USEOK --> RF1
 
-    USER -->|🗑️ 폐기 버튼| DISC["fridge.discard_ingredient<br>history에 discarded 기록"]
+    USER -->|"폐기 버튼"| DISC["fridge.discard_ingredient<br>history에 discarded 기록"]
     DISC --> RF1
 
-    USER -->|📖 레시피 보기| RECDLG[RecipeDetailDialog<br>조리법 스크롤 팝업]
+    USER -->|"레시피 보기"| RECDLG["RecipeDetailDialog<br>조리법 스크롤 팝업"]
     RECDLG --> LOOP
 
-    USER -->|🛒 쿠팡 버튼| BROWSER["webbrowser.open<br>쿠팡 검색 URL"]
+    USER -->|"쿠팡 버튼"| BROWSER["webbrowser.open<br>쿠팡 검색 URL"]
     BROWSER --> LOOP
 
     style START fill:#2d2a0a,stroke:#e3b341,color:#e3b341
@@ -790,18 +790,18 @@ flowchart TD
   <div class="mbox">
     <div class="mermaid">
 flowchart LR
-    FRIDGE["🧊 Fridge.items<br>현재 재고"] --> MR & UP & MP
-    RECIPE["📖 RECIPE_DB<br>레시피 목록"] --> MR & UP & MP
+    FRIDGE["Fridge.items<br>현재 재고"] --> MR & UP & MP
+    RECIPE["RECIPE_DB<br>레시피 목록"] --> MR & UP & MP
 
-    MR["① match_ratio<br>보유 재료 수 ÷ 전체 재료 수<br>0.0 ~ 1.0"]
-    UP["② urgency<br>Σ max(0, 1 - days/7) ÷ N<br>임박도 평균 0.0~1.0"]
-    MP["③ missing_penalty<br>없는 재료 수 ÷ 전체 재료 수<br>0.0 ~ 1.0"]
+    MR["① match_ratio<br>보유 재료 수 / 전체 재료 수<br>0.0 ~ 1.0"]
+    UP["② urgency<br>Sigma max(0, 1 - days/7) / N<br>임박도 평균 0.0~1.0"]
+    MP["③ missing_penalty<br>없는 재료 수 / 전체 재료 수<br>0.0 ~ 1.0"]
 
-    MR -->|"× 0.5"| SCORE
-    UP -->|"× 0.4"| SCORE
-    MP -->|"× 0.1 (빼기)"| SCORE
+    MR -->|"x 0.5"| SCORE
+    UP -->|"x 0.4"| SCORE
+    MP -->|"x 0.1 빼기"| SCORE
 
-    SCORE["🎯 score<br>= 0.5×match<br>+ 0.4×urgency<br>− 0.1×penalty"]
+    SCORE["score<br>= 0.5 x match<br>+ 0.4 x urgency<br>- 0.1 x penalty"]
 
     SCORE --> SORT["모든 레시피 점수 계산<br>내림차순 정렬"]
     SORT --> TOPN["Top N 반환<br>기본 top_n = 3"]
@@ -817,23 +817,23 @@ flowchart LR
   <div class="mbox">
     <div class="mermaid">
 graph LR
-    subgraph DATA["🗄️ 데이터 레이어 (database.py)"]
+    subgraph DATA["데이터 레이어 (database.py)"]
         EDB["EXPIRY_DB<br>20종 유통기한+카테고리"]
         NDB["NUTRITION_DB<br>100g 기준 영양 정보"]
         RDB["RECIPE_DB<br>레시피 11개"]
     end
-    subgraph LOGIC["⚙️ 비즈니스 로직"]
+    subgraph LOGIC["비즈니스 로직"]
         ING["Ingredient<br>유통기한 계산<br>임박 판정"]
         FR["Fridge<br>CRUD<br>이력 관리"]
         RC["RecipeRecommender<br>점수 계산 Top N"]
-        AN["analytics.py<br>폐기율·빈도·장보기"]
+        AN["analytics.py<br>폐기율 / 빈도 / 장보기"]
     end
-    subgraph GUI["🖥️ GUI 레이어"]
-        DASH["DashboardView<br>통계카드·임박목록·추천"]
+    subgraph GUI["GUI 레이어"]
+        DASH["DashboardView<br>통계카드 / 임박목록 / 추천"]
         INV2["InventoryView<br>Treeview 테이블"]
-        REC2["RecipeView<br>Top3 카드·영양"]
+        REC2["RecipeView<br>Top3 카드 / 영양"]
         ANA2["AnalyticsView<br>matplotlib 차트"]
-        SHOP2["ShoppingView<br>체크박스·쿠팡링크"]
+        SHOP2["ShoppingView<br>체크박스 / 쿠팡링크"]
     end
 
     EDB --> ING --> FR
@@ -922,19 +922,19 @@ sequenceDiagram
   <div class="mbox">
     <div class="mermaid">
 flowchart TD
-    START([generate_shopping_list 호출]) --> C1 & C2
+    START(["generate_shopping_list 호출"]) --> C1 & C2
 
-    C1["기준 ① 재고 부족<br>fridge.items에서<br>quantity ≤ 1 인 재료"]
-    C2["기준 ② 자주 쓰는 재료<br>top_used 상위 5개 중<br>재고 없거나 quantity ≤ 1"]
+    C1["기준 1 - 재고 부족<br>fridge.items에서<br>quantity <= 1 인 재료"]
+    C2["기준 2 - 자주 쓰는 재료<br>top_used 상위 5개 중<br>재고 없거나 quantity <= 1"]
 
     C1 --> MERGE["중복 제거 dict 병합<br>key = 재료명"]
     C2 --> MERGE
 
     MERGE --> LINK["각 항목에 쿠팡 검색 URL 추가<br>COUPANG_SEARCH.format(name)"]
-    LINK --> RESULT["list[dict] 반환<br>name · reason · link"]
+    LINK --> RESULT["list of dict 반환<br>name / reason / link"]
 
     RESULT --> VIEW["ShoppingView에서<br>체크박스 카드로 렌더링"]
-    VIEW --> BTN["🛒 쿠팡 버튼 클릭<br>webbrowser.open(url)"]
+    VIEW --> BTN["쿠팡 버튼 클릭<br>webbrowser.open(url)"]
 
     style START fill:#2d2a0a,stroke:#e3b341,color:#e3b341
     style RESULT fill:#1f3d6e,stroke:#58a6ff,color:#58a6ff
