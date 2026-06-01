@@ -6,12 +6,25 @@ matplotlib.backends.backend_tkagg.FigureCanvasTkAgg로 차트를 임베드합니
 """
 
 from __future__ import annotations
+import matplotlib
+import matplotlib.font_manager as fm
 import customtkinter as ctk
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from fridge import Fridge
 from analytics import waste_rate, top_used, category_distribution
-from ingredient import CATEGORY_EMOJI
+
+
+# 한글 폰트 설정
+_KO_FONTS = [
+    "Noto Sans CJK KR", "Noto Sans CJK JP", "NanumGothic", "NanumBarunGothic",
+    "AppleGothic", "Malgun Gothic", "DejaVu Sans",
+]
+for _f in _KO_FONTS:
+    if any(fe.name == _f for fe in fm.fontManager.ttflist):
+        matplotlib.rc("font", family=_f)
+        break
+matplotlib.rc("axes", unicode_minus=False)
 
 
 class AnalyticsView(ctk.CTkFrame):
@@ -156,7 +169,7 @@ class AnalyticsView(ctk.CTkFrame):
         # ── 막대 그래프: 사용 빈도 Top 5 ──────────────────
         ax1 = self._fig.add_subplot(1, 2, 1)
         ax1.set_facecolor(bg)
-        ax1.set_title("🔝 사용 빈도 Top 5", color=fg_text, fontsize=12, pad=8)
+        ax1.set_title("사용 빈도 Top 5", color=fg_text, fontsize=12, pad=8)
 
         if top:
             names   = [n for n, _ in top]
@@ -186,12 +199,10 @@ class AnalyticsView(ctk.CTkFrame):
         # ── 파이 차트: 카테고리별 비중 ──────────────────────
         ax2 = self._fig.add_subplot(1, 2, 2)
         ax2.set_facecolor(bg)
-        ax2.set_title("📦 카테고리별 비중", color=fg_text, fontsize=12, pad=8)
+        ax2.set_title("카테고리별 비중", color=fg_text, fontsize=12, pad=8)
 
         if dist:
-            labels = [
-                f"{CATEGORY_EMOJI.get(k,'📦')} {k}" for k in dist.keys()
-            ]
+            labels = list(dist.keys())
             sizes  = list(dist.values())
             palette = ["#1F6AA5", "#4CAF50", "#FFA500", "#FF4444",
                        "#9C27B0", "#00BCD4", "#FF9800"][:len(sizes)]
