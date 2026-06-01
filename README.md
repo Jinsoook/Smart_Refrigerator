@@ -1,4 +1,4 @@
-# Smart_Refrigerator
+# FridgeMate : Smart_Refrigerator
 26 소프트웨어적 사고 / 기말 프로젝트
 
 # 조건
